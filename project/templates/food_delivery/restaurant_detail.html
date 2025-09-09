@@ -1,0 +1,365 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ restaurant.name }} - Swiggy{% endblock %}
+
+{% block content %}
+<style>
+    .restaurant-header {
+        background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+        color: white;
+        padding: 3rem 0;
+        margin-bottom: 2rem;
+        border-radius: 0 0 30px 30px;
+    }
+
+    .restaurant-hero {
+        display: grid;
+        grid-template-columns: 1fr 300px;
+        gap: 2rem;
+        align-items: center;
+    }
+
+    .restaurant-info h1 {
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+    }
+
+    .restaurant-cuisines {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        margin-bottom: 1.5rem;
+    }
+
+    .restaurant-meta {
+        display: flex;
+        gap: 2rem;
+        margin-bottom: 1rem;
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .rating {
+        background: rgba(255,255,255,0.2);
+        padding: 0.5rem 1rem;
+        border-radius: 25px;
+        font-weight: bold;
+    }
+
+    .restaurant-image {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 15px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    }
+
+    .offer-banner {
+        background: #007bff;
+        color: white;
+        padding: 1rem;
+        border-radius: 10px;
+        margin-bottom: 2rem;
+        text-align: center;
+        font-weight: bold;
+    }
+
+    .back-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #666;
+        text-decoration: none;
+        margin-bottom: 2rem;
+        padding: 0.5rem 1rem;
+        border-radius: 25px;
+        transition: all 0.3s ease;
+    }
+
+    .back-button:hover {
+        background: #f8f9fa;
+        color: #ff6b35;
+    }
+
+    .menu-section {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .menu-title {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 2rem;
+        color: #333;
+    }
+
+    .menu-item {
+        display: grid;
+        grid-template-columns: 1fr 150px;
+        gap: 1.5rem;
+        padding: 1.5rem 0;
+        border-bottom: 1px solid #eee;
+        align-items: start;
+    }
+
+    .menu-item:last-child {
+        border-bottom: none;
+    }
+
+    .item-info h3 {
+        font-size: 1.2rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .veg-indicator {
+        width: 12px;
+        height: 12px;
+        border-radius: 2px;
+    }
+
+    .veg {
+        background: #28a745;
+    }
+
+    .non-veg {
+        background: #dc3545;
+    }
+
+    .item-description {
+        color: #666;
+        margin-bottom: 1rem;
+        line-height: 1.5;
+    }
+
+    .item-price {
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: #ff6b35;
+        margin-bottom: 0.5rem;
+    }
+
+    .item-rating {
+        color: #28a745;
+        font-size: 0.9rem;
+        font-weight: bold;
+    }
+
+    .item-image-container {
+        position: relative;
+        text-align: center;
+    }
+
+    .item-image {
+        width: 100%;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 10px;
+        margin-bottom: 1rem;
+    }
+
+    .add-button {
+        background: #ff6b35;
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        width: 100%;
+    }
+
+    .add-button:hover {
+        background: #e55a2b;
+        transform: translateY(-2px);
+    }
+
+    .add-button:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .bestseller-badge {
+        background: #ff6b35;
+        color: white;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        font-weight: bold;
+        margin-left: 0.5rem;
+    }
+
+    .no-menu {
+        text-align: center;
+        padding: 3rem;
+        color: #666;
+    }
+
+    @media (max-width: 768px) {
+        .restaurant-hero {
+            grid-template-columns: 1fr;
+            text-align: center;
+        }
+
+        .restaurant-meta {
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .menu-item {
+            grid-template-columns: 1fr;
+            text-align: center;
+        }
+
+        .restaurant-info h1 {
+            font-size: 2rem;
+        }
+    }
+</style>
+
+<a href="{% url 'food_delivery:home' %}" class="back-button">
+    ← Back to restaurants
+</a>
+
+<div class="restaurant-header">
+    <div class="restaurant-hero">
+        <div class="restaurant-info">
+            <h1>{{ restaurant.name }}</h1>
+            <p class="restaurant-cuisines">{{ restaurant.cuisines|join:", " }}</p>
+            
+            <div class="restaurant-meta">
+                <div class="meta-item">
+                    <span class="rating">★ {{ restaurant.rating }}</span>
+                </div>
+                <div class="meta-item">
+                    <span>🕒 {{ restaurant.delivery_time }}</span>
+                </div>
+                <div class="meta-item">
+                    <span>📍 {{ restaurant.location }}</span>
+                </div>
+            </div>
+            
+            <div class="meta-item">
+                <span>₹{{ restaurant.cost_for_two }} for two</span>
+            </div>
+        </div>
+        
+        <div>
+            <img src="{{ restaurant.image }}" alt="{{ restaurant.name }}" class="restaurant-image">
+        </div>
+    </div>
+</div>
+
+{% if restaurant.offer %}
+<div class="offer-banner">
+    🎉 {{ restaurant.offer }}
+</div>
+{% endif %}
+
+<div class="menu-section">
+    <h2 class="menu-title">Menu</h2>
+    
+    {% if menu_items %}
+        {% for item in menu_items %}
+        <div class="menu-item">
+            <div class="item-info">
+                <h3>
+                    <span class="veg-indicator {% if item.is_veg %}veg{% else %}non-veg{% endif %}"></span>
+                    {{ item.name }}
+                    {% if item.is_bestseller %}
+                        <span class="bestseller-badge">BESTSELLER</span>
+                    {% endif %}
+                </h3>
+                
+                <p class="item-description">{{ item.description }}</p>
+                
+                <div class="item-price">₹{{ item.price }}</div>
+                
+                {% if item.rating %}
+                    <div class="item-rating">★ {{ item.rating }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="item-image-container">
+                <img src="{{ item.image }}" alt="{{ item.name }}" class="item-image">
+                <button 
+                    class="add-button" 
+                    onclick="addToCart({{ item.id }})"
+                    {% if not user.is_authenticated %}disabled title="Please login to add items"{% endif %}
+                >
+                    {% if user.is_authenticated %}
+                        Add to Cart
+                    {% else %}
+                        Login to Add
+                    {% endif %}
+                </button>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="no-menu">
+            <h3>Menu coming soon...</h3>
+            <p>This restaurant is updating their menu. Please check back later.</p>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+    // Add some visual feedback when adding items
+    function addToCart(menuItemId) {
+        const button = event.target;
+        const originalText = button.textContent;
+        
+        // Show loading state
+        button.textContent = 'Adding...';
+        button.disabled = true;
+        
+        // Call the global addToCart function from base template
+        fetch('/add-to-cart/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                menu_item_id: menuItemId,
+                quantity: 1
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('cart-count').textContent = data.cart_count;
+                button.textContent = 'Added!';
+                button.style.background = '#28a745';
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = '#ff6b35';
+                    button.disabled = false;
+                }, 1500);
+            } else {
+                alert('Error adding item to cart');
+                button.textContent = originalText;
+                button.disabled = false;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error adding item to cart');
+            button.textContent = originalText;
+            button.disabled = false;
+        });
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,188 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - Swiggy{% endblock %}
+
+{% block content %}
+<style>
+    .auth-container {
+        max-width: 400px;
+        margin: 3rem auto;
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+
+    .auth-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .auth-header h1 {
+        font-size: 2rem;
+        color: #333;
+        margin-bottom: 0.5rem;
+    }
+
+    .auth-header p {
+        color: #666;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: border-color 0.3s ease;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #ff6b35;
+        box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+    }
+
+    .btn-auth {
+        width: 100%;
+        background: #ff6b35;
+        color: white;
+        border: none;
+        padding: 0.75rem;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-bottom: 1rem;
+    }
+
+    .btn-auth:hover {
+        background: #e55a2b;
+        transform: translateY(-2px);
+    }
+
+    .auth-links {
+        text-align: center;
+        margin-top: 1.5rem;
+    }
+
+    .auth-links a {
+        color: #ff6b35;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .auth-links a:hover {
+        text-decoration: underline;
+    }
+
+    .divider {
+        text-align: center;
+        margin: 1.5rem 0;
+        position: relative;
+        color: #666;
+    }
+
+    .divider::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: #e9ecef;
+        z-index: 1;
+    }
+
+    .divider span {
+        background: white;
+        padding: 0 1rem;
+        position: relative;
+        z-index: 2;
+    }
+
+    .demo-info {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        font-size: 0.9rem;
+        color: #666;
+        text-align: center;
+    }
+
+    .demo-info strong {
+        color: #333;
+    }
+</style>
+
+<div class="auth-container">
+    <div class="auth-header">
+        <h1>Welcome Back!</h1>
+        <p>Sign in to your account to continue ordering</p>
+    </div>
+
+    <div class="demo-info">
+        <strong>Demo Mode:</strong> You can use any username/password to login, or create a new account.
+    </div>
+
+    <form method="POST">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="username" class="form-label">Username</label>
+            <input 
+                type="text" 
+                id="username" 
+                name="username" 
+                class="form-control" 
+                placeholder="Enter your username"
+                required
+            >
+        </div>
+        
+        <div class="form-group">
+            <label for="password" class="form-label">Password</label>
+            <input 
+                type="password" 
+                id="password" 
+                name="password" 
+                class="form-control" 
+                placeholder="Enter your password"
+                required
+            >
+        </div>
+        
+        <button type="submit" class="btn-auth">Sign In</button>
+    </form>
+
+    <div class="divider">
+        <span>or</span>
+    </div>
+
+    <div class="auth-links">
+        <p>Don't have an account? <a href="{% url 'food_delivery:register' %}">Create Account</a></p>
+    </div>
+</div>
+
+<script>
+    // Add some visual feedback
+    document.querySelector('form').addEventListener('submit', function() {
+        const button = document.querySelector('.btn-auth');
+        button.textContent = 'Signing In...';
+        button.disabled = true;
+    });
+</script>
+{% endblock %}

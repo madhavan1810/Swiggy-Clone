@@ -1,0 +1,313 @@
+{% extends 'base.html' %}
+
+{% block title %}Checkout - Swiggy{% endblock %}
+
+{% block content %}
+<style>
+    .checkout-container {
+        max-width: 900px;
+        margin: 2rem auto;
+        display: grid;
+        grid-template-columns: 1fr 400px;
+        gap: 2rem;
+    }
+
+    .checkout-form {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        height: fit-content;
+    }
+
+    .form-section {
+        margin-bottom: 2rem;
+    }
+
+    .section-title {
+        font-size: 1.3rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+        color: #333;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: border-color 0.3s ease;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #ff6b35;
+    }
+
+    .order-summary {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        height: fit-content;
+        position: sticky;
+        top: 2rem;
+    }
+
+    .summary-title {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 1.5rem;
+        color: #333;
+    }
+
+    .order-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 0;
+        border-bottom: 1px solid #eee;
+    }
+
+    .order-item:last-child {
+        border-bottom: none;
+    }
+
+    .item-info {
+        flex: 1;
+    }
+
+    .item-name {
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+    }
+
+    .item-restaurant {
+        font-size: 0.9rem;
+        color: #666;
+    }
+
+    .item-quantity {
+        color: #666;
+        margin: 0 1rem;
+    }
+
+    .item-price {
+        font-weight: bold;
+        color: #ff6b35;
+    }
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        margin: 1rem 0;
+        padding: 0.5rem 0;
+    }
+
+    .summary-total {
+        border-top: 2px solid #eee;
+        padding-top: 1rem;
+        margin-top: 1rem;
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #ff6b35;
+    }
+
+    .place-order-btn {
+        width: 100%;
+        background: #ff6b35;
+        color: white;
+        border: none;
+        padding: 1rem;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 1.5rem;
+    }
+
+    .place-order-btn:hover {
+        background: #e55a2b;
+        transform: translateY(-2px);
+    }
+
+    .place-order-btn:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .delivery-info {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .delivery-time {
+        color: #28a745;
+        font-weight: bold;
+    }
+
+    .veg-indicator {
+        width: 12px;
+        height: 12px;
+        border-radius: 2px;
+        display: inline-block;
+        margin-right: 0.5rem;
+    }
+
+    .veg {
+        background: #28a745;
+    }
+
+    .non-veg {
+        background: #dc3545;
+    }
+
+    @media (max-width: 768px) {
+        .checkout-container {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .order-summary {
+            position: static;
+        }
+    }
+</style>
+
+<div class="checkout-container">
+    <div class="checkout-form">
+        <h1 style="font-size: 2rem; margin-bottom: 2rem; color: #333;">Checkout</h1>
+        
+        <form method="POST" action="{% url 'food_delivery:place_order' %}">
+            {% csrf_token %}
+            
+            <div class="form-section">
+                <h2 class="section-title">
+                    📍 Delivery Details
+                </h2>
+                
+                <div class="form-group">
+                    <label for="delivery_address" class="form-label">Delivery Address *</label>
+                    <textarea 
+                        id="delivery_address" 
+                        name="delivery_address" 
+                        class="form-control" 
+                        rows="3" 
+                        placeholder="Enter your complete delivery address..."
+                        required
+                    ></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="phone" class="form-label">Phone Number *</label>
+                    <input 
+                        type="tel" 
+                        id="phone" 
+                        name="phone" 
+                        class="form-control" 
+                        placeholder="Enter your phone number"
+                        required
+                    >
+                </div>
+            </div>
+            
+            <div class="delivery-info">
+                <div class="delivery-time">🕒 Estimated delivery: 25-30 minutes</div>
+                <div style="font-size: 0.9rem; color: #666; margin-top: 0.5rem;">
+                    Your order will be prepared fresh and delivered hot!
+                </div>
+            </div>
+            
+            <button type="submit" class="place-order-btn">
+                Place Order - ₹{% widthratio total 1 1 %}{% widthratio 40 1 1 %}{% widthratio total 20 1 %}
+            </button>
+        </form>
+    </div>
+    
+    <div class="order-summary">
+        <h2 class="summary-title">Order Summary</h2>
+        
+        {% for item in cart_items %}
+        <div class="order-item">
+            <div class="item-info">
+                <div class="item-name">
+                    <span class="veg-indicator {% if item.menu_item.is_veg %}veg{% else %}non-veg{% endif %}"></span>
+                    {{ item.menu_item.name }}
+                </div>
+                <div class="item-restaurant">{{ item.menu_item.restaurant.name }}</div>
+            </div>
+            <div class="item-quantity">x{{ item.quantity }}</div>
+            <div class="item-price">₹{{ item.menu_item.price|mul:item.quantity }}</div>
+        </div>
+        {% endfor %}
+        
+        <div class="summary-row">
+            <span>Subtotal</span>
+            <span>₹{{ total }}</span>
+        </div>
+        
+        <div class="summary-row">
+            <span>Delivery Fee</span>
+            <span>₹40</span>
+        </div>
+        
+        <div class="summary-row">
+            <span>Taxes & Fees</span>
+            <span>₹{{ total|floatformat:0|add:'40'|mul:'0.05'|floatformat:0 }}</span>
+        </div>
+        
+        <div class="summary-row summary-total">
+            <span>Total Amount</span>
+            <span>₹{% widthratio total 1 1 %}{% widthratio 40 1 1 %}{% widthratio total 20 1 %}</span>
+        </div>
+        
+        <div style="margin-top: 1.5rem; padding: 1rem; background: #f8f9fa; border-radius: 8px; font-size: 0.9rem; color: #666;">
+            💳 Payment will be collected on delivery (Cash on Delivery)
+        </div>
+    </div>
+</div>
+
+<script>
+    // Form validation
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const address = document.getElementById('delivery_address').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+        
+        if (!address || !phone) {
+            e.preventDefault();
+            alert('Please fill in all required fields');
+            return;
+        }
+        
+        if (phone.length < 10) {
+            e.preventDefault();
+            alert('Please enter a valid phone number');
+            return;
+        }
+        
+        // Show loading state
+        const button = document.querySelector('.place-order-btn');
+        button.textContent = 'Placing Order...';
+        button.disabled = true;
+    });
+</script>
+{% endblock %}

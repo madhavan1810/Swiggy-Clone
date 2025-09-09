@@ -1,0 +1,321 @@
+{% extends 'base.html' %}
+
+{% block title %}Your Cart - Swiggy{% endblock %}
+
+{% block content %}
+<style>
+    .cart-container {
+        max-width: 800px;
+        margin: 2rem auto;
+    }
+
+    .cart-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .cart-header h1 {
+        font-size: 2.5rem;
+        color: #333;
+        margin-bottom: 0.5rem;
+    }
+
+    .cart-item {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        display: grid;
+        grid-template-columns: 80px 1fr auto auto;
+        gap: 1rem;
+        align-items: center;
+    }
+
+    .item-image {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+
+    .item-details h3 {
+        font-size: 1.1rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+        color: #333;
+    }
+
+    .item-restaurant {
+        color: #666;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .item-price {
+        font-weight: bold;
+        color: #ff6b35;
+    }
+
+    .quantity-controls {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: #f8f9fa;
+        border-radius: 25px;
+        padding: 0.5rem;
+    }
+
+    .quantity-btn {
+        background: #ff6b35;
+        color: white;
+        border: none;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        transition: background 0.3s ease;
+    }
+
+    .quantity-btn:hover {
+        background: #e55a2b;
+    }
+
+    .quantity-display {
+        min-width: 30px;
+        text-align: center;
+        font-weight: bold;
+    }
+
+    .remove-btn {
+        background: #dc3545;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: background 0.3s ease;
+    }
+
+    .remove-btn:hover {
+        background: #c82333;
+    }
+
+    .cart-summary {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        margin-top: 2rem;
+    }
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #eee;
+    }
+
+    .summary-row:last-child {
+        border-bottom: none;
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #ff6b35;
+    }
+
+    .checkout-btn {
+        width: 100%;
+        background: #ff6b35;
+        color: white;
+        border: none;
+        padding: 1rem;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 1rem;
+    }
+
+    .checkout-btn:hover {
+        background: #e55a2b;
+        transform: translateY(-2px);
+    }
+
+    .empty-cart {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .empty-cart h2 {
+        font-size: 2rem;
+        color: #666;
+        margin-bottom: 1rem;
+    }
+
+    .empty-cart p {
+        color: #999;
+        margin-bottom: 2rem;
+    }
+
+    .veg-indicator {
+        width: 12px;
+        height: 12px;
+        border-radius: 2px;
+        display: inline-block;
+        margin-right: 0.5rem;
+    }
+
+    .veg {
+        background: #28a745;
+    }
+
+    .non-veg {
+        background: #dc3545;
+    }
+
+    @media (max-width: 768px) {
+        .cart-item {
+            grid-template-columns: 1fr;
+            text-align: center;
+            gap: 1rem;
+        }
+
+        .quantity-controls {
+            justify-content: center;
+        }
+
+        .cart-header h1 {
+            font-size: 2rem;
+        }
+    }
+</style>
+
+<div class="cart-container">
+    <div class="cart-header">
+        <h1>Your Cart</h1>
+        <p>Review your items before checkout</p>
+    </div>
+
+    {% if cart_items %}
+        {% for item in cart_items %}
+        <div class="cart-item">
+            <img src="{{ item.menu_item.image }}" alt="{{ item.menu_item.name }}" class="item-image">
+            
+            <div class="item-details">
+                <h3>
+                    <span class="veg-indicator {% if item.menu_item.is_veg %}veg{% else %}non-veg{% endif %}"></span>
+                    {{ item.menu_item.name }}
+                </h3>
+                <div class="item-restaurant">{{ item.menu_item.restaurant.name }}</div>
+                <div class="item-price">₹{{ item.menu_item.price }}</div>
+            </div>
+            
+            <div class="quantity-controls">
+                <button class="quantity-btn" onclick="updateQuantity({{ item.id }}, {{ item.quantity|add:'-1' }})">-</button>
+                <span class="quantity-display">{{ item.quantity }}</span>
+                <button class="quantity-btn" onclick="updateQuantity({{ item.id }}, {{ item.quantity|add:'1' }})">+</button>
+            </div>
+            
+            <button class="remove-btn" onclick="removeFromCart({{ item.id }})">Remove</button>
+        </div>
+        {% endfor %}
+
+        <div class="cart-summary">
+            <div class="summary-row">
+                <span>Subtotal</span>
+                <span>₹{{ total }}</span>
+            </div>
+            <div class="summary-row">
+                <span>Delivery Fee</span>
+                <span>₹40</span>
+            </div>
+            <div class="summary-row">
+                <span>Taxes</span>
+                <span>₹{{ total|floatformat:0|add:'40'|mul:'0.05'|floatformat:0 }}</span>
+            </div>
+            <div class="summary-row">
+                <span>Total</span>
+                <span>₹{% widthratio total 1 1 %}{% widthratio 40 1 1 %}{% widthratio total 20 1 %}</span>
+            </div>
+            
+            <button class="checkout-btn" onclick="location.href='{% url 'food_delivery:checkout' %}'">
+                Proceed to Checkout
+            </button>
+        </div>
+    {% else %}
+        <div class="empty-cart">
+            <h2>🛒 Your cart is empty</h2>
+            <p>Add some delicious items to get started!</p>
+            <a href="{% url 'food_delivery:home' %}" class="btn btn-primary">Browse Restaurants</a>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+    function updateQuantity(cartItemId, newQuantity) {
+        if (newQuantity < 1) {
+            removeFromCart(cartItemId);
+            return;
+        }
+
+        fetch('/update-cart/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                cart_item_id: cartItemId,
+                quantity: newQuantity
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error updating cart');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error updating cart');
+        });
+    }
+
+    function removeFromCart(cartItemId) {
+        if (confirm('Remove this item from cart?')) {
+            fetch('/remove-from-cart/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    cart_item_id: cartItemId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Error removing item');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error removing item');
+            });
+        }
+    }
+</script>
+{% endblock %}
